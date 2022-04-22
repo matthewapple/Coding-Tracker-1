@@ -1,17 +1,37 @@
 ﻿using System;
 using System.Configuration;
 using System.Collections.Specialized;
+using Microsoft.Data.Sqlite;
+using ConsoleTableExt;
 
 
 namespace Coding_Tracker_1
 {
     internal class Program
     {
-        public static string connectionString = ConfigurationManager.AppSettings["k1"];
+       
+
+        static string connectionString = ConfigurationManager.AppSettings["k1"];
         static void Main(string[] args)
         {
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
 
-            Console.WriteLine($"{connectionString}");
+                var tableCommand = connection.CreateCommand();
+                tableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Coding_Tracker 
+                    (Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Date TEXT,
+                    Quantity INTEGER)";
+
+                tableCommand.ExecuteNonQuery();
+
+                connection.Close();
+            }
+
+            UserInput.GetInput();
+
+
         }
     }
 }
