@@ -36,7 +36,7 @@ namespace Coding_Tracker_1
                         break;
 
                     case "1":
-                        //Insert();
+                        CodingController.Insert();
                         break;
 
                     case "2":

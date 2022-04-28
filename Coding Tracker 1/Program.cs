@@ -22,7 +22,9 @@ namespace Coding_Tracker_1
                 tableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Coding_Tracker 
                     (Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Date TEXT,
-                    Quantity INTEGER)";
+                    StartTime TEXT,
+                    EndTime TEXT,
+                    Duration TEXT)";
 
                 tableCommand.ExecuteNonQuery();
 
