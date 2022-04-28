@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
-using System.Configuration;
+
 
 
 namespace Coding_Tracker_1
 {
     public class UserInput
     {
-        static string connectionString = ConfigurationManager.AppSettings["k1"];
         public static void GetInput()
         {
             Console.Clear();
@@ -59,6 +57,29 @@ namespace Coding_Tracker_1
 
                 }
             }
+        }
+        public static string GetDateInput()
+        {
+            Console.WriteLine("Please enter date of coding in MM-DD-YYYY format. Enter 0 to return to main menu.");
+
+            string input = Console.ReadLine();
+
+            if (input == "0")
+                GetInput();
+
+            return input;
+
+        }
+        public static string GetNumberInput(string message)
+        {
+            Console.WriteLine(message);
+
+            string input = Console.ReadLine();
+
+            if (input == "0")
+                GetInput();
+
+            return input;
         }
     }
 }
