@@ -10,7 +10,7 @@ namespace Coding_Tracker_1
 {
     public class UserInput
     {
-        public static void GetInput()
+        public static void GetSelection()
         {
             Console.Clear();
             bool closeApp = false;
@@ -40,44 +40,32 @@ namespace Coding_Tracker_1
                         break;
 
                     case "2":
-                        //Update();
+                        CodingController.Update();
                         break;
 
                     case "3":
-                        //GetAllRecords();
+                        CodingController.GetAllRecords();
                         break;
 
                     case "4":
-                        //Delete();
+                        CodingController.Delete();
                         break;
                     default:
                         Console.WriteLine("Invalid input. Please enter a number 0 - 4");
                         break;
 
-
                 }
             }
         }
-        public static string GetDateInput()
-        {
-            Console.WriteLine("Please enter date of coding in MM-DD-YYYY format. Enter 0 to return to main menu.");
 
-            string input = Console.ReadLine();
-
-            if (input == "0")
-                GetInput();
-
-            return input;
-
-        }
-        public static string GetNumberInput(string message)
+        public static string GetUserInput(string message)
         {
             Console.WriteLine(message);
 
             string input = Console.ReadLine();
 
             if (input == "0")
-                GetInput();
+                GetSelection();
 
             return input;
         }

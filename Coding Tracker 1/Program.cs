@@ -31,8 +31,7 @@ namespace Coding_Tracker_1
                 connection.Close();
             }
 
-            UserInput.GetInput();
-
+            UserInput.GetSelection();
 
         }
     }
