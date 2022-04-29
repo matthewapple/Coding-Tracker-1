@@ -14,26 +14,35 @@ namespace Coding_Tracker_1
     internal class CodingController
     {
         static string connectionString = ConfigurationManager.AppSettings["k1"];
-
         //Duration calculation
-        internal static string Duration(string startTime, string endTime)
-        {
-            DateTime startDuration = DateTime.ParseExact(startTime, "t", new CultureInfo("en-US"));
-            DateTime endDuration = DateTime.ParseExact(endTime, "t", new CultureInfo("en-US"));
-            double difference = (endDuration - startDuration).TotalHours;
-            string final = Convert.ToString(difference);
+        internal static int Duration(string startTime, string endTime)
+        { 
+            TimeSpan startDuration = TimeSpan.ParseExact(startTime,"hh\\:mm", CultureInfo.InvariantCulture);
+            TimeSpan endDuration = TimeSpan.ParseExact(endTime, "hh\\:mm", CultureInfo.InvariantCulture);
+            TimeSpan difference = (endDuration - startDuration);
+            string stringDifference = difference.TotalHours.ToString();
+
+            int final = Convert.ToInt32(stringDifference);
+
             return final;
+
         }
         public static void Insert()
         {
+            Console.Clear();
 
-            string date = UserInput.GetUserInput("Please enter date of coding in MM-DD-YY format.");
+            Console.WriteLine("INSERT");
+            Console.WriteLine("--------");
+            Console.WriteLine("Enter 0 at any time to return to Main Menu");
+            Console.WriteLine("--------\n");
 
-            string startTime = UserInput.GetUserInput("Enter time coding started. Enter 0 to return to main menu");
+            string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
 
-            string endTime = UserInput.GetUserInput("Enter time coding stopped. Enter 0 to return to main menu");
+            string startTime = UserInput.GetNumberInput("Enter time coding started");
 
-            string duration = Duration(startTime, endTime);
+            string endTime = UserInput.GetNumberInput("Enter time coding stopped");
+
+            int duration = Duration(startTime, endTime);
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -41,18 +50,19 @@ namespace Coding_Tracker_1
 
                 var tableCommand = connection.CreateCommand();
 
-                tableCommand.CommandText = $"INSERT INTO Coding_Tracker (Date, StartTime, EndTime, Duration) VALUES ('{date}','{startTime}','{endTime}','{duration}')";
+                tableCommand.CommandText = $"INSERT INTO Coding_Tracker (Date, StartTime, EndTime, Duration) VALUES ('{date}','{startTime}','{endTime}',{duration})";
 
                 tableCommand.ExecuteNonQuery();
 
                 connection.Close();
             }
-            Console.WriteLine($"\n\nYou coded for {duration} hours\n\n");
+
+            UserInput.GetSelection();
         }
         public static void GetAllRecords()
         {
-            Console.Clear();
-
+            Console.WriteLine("ALL ENTRIES");
+            Console.WriteLine("------------");
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
@@ -100,7 +110,11 @@ namespace Coding_Tracker_1
 
             GetAllRecords();
 
-            var inputId = UserInput.GetUserInput("Enter ID of record you would like to update.");
+            Console.WriteLine("------");
+            Console.WriteLine("Enter 0 at any time to return to Main Menu");
+            Console.WriteLine("------\n");
+
+            var inputId = UserInput.GetNumberInput("Enter ID of record you would like to update.");
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -108,15 +122,15 @@ namespace Coding_Tracker_1
 
                 var tableCommand = connection.CreateCommand();
 
-                string date = UserInput.GetUserInput("Please enter date of coding in MM-DD-YY format.");
+                string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
 
-                string startTime = UserInput.GetUserInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
+                string startTime = UserInput.GetNumberInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
 
-                string endTime = UserInput.GetUserInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
+                string endTime = UserInput.GetNumberInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
 
-                string duration = Duration(startTime, endTime);
+                int duration = Duration(startTime, endTime);
 
-                tableCommand.CommandText = $"UPDATE Coding_Tracker SET Date = '{date}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = '{duration}' WHERE Id = {inputId}";
+                tableCommand.CommandText = $"UPDATE Coding_Tracker SET Date = '{date}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = {duration} WHERE Id = {inputId}";
 
                 int rowCount = tableCommand.ExecuteNonQuery();
 
@@ -137,9 +151,16 @@ namespace Coding_Tracker_1
         }
         public static void Delete()
         {
+            Console.Clear();
+
+            Console.WriteLine("DELETE");
+            Console.WriteLine("--------");
+            Console.WriteLine("Enter 0 at any time to return to Main Menu");
+            Console.WriteLine("--------\n");
+
             GetAllRecords();
 
-            var inputId = UserInput.GetUserInput("Enter ID of record you would like to delete.");
+            var inputId = UserInput.GetDateInput("Enter ID of record you would like to delete.");
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -166,6 +187,7 @@ namespace Coding_Tracker_1
 
                 connection.Close();
 
+                UserInput.GetSelection();
             }
             
         }

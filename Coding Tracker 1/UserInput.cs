@@ -16,8 +16,9 @@ namespace Coding_Tracker_1
             bool closeApp = false;
             while (closeApp == false)
             {
-                Console.WriteLine("MAIN MENU\n");
-                Console.WriteLine("Please select an option");
+                Console.WriteLine("      MAIN MENU\n");
+                Console.WriteLine("----------------------");
+                Console.WriteLine("\nPlease select an option");
                 Console.WriteLine("\n----------------------");
                 Console.WriteLine("\nType 0 to Close Application");
                 Console.WriteLine("Type 1 to Insert an Entry");
@@ -44,6 +45,7 @@ namespace Coding_Tracker_1
                         break;
 
                     case "3":
+                        Console.Clear();
                         CodingController.GetAllRecords();
                         break;
 
@@ -58,7 +60,18 @@ namespace Coding_Tracker_1
             }
         }
 
-        public static string GetUserInput(string message)
+        public static string GetDateInput(string message)
+        {
+            Console.WriteLine(message);
+
+            string input = Console.ReadLine();
+            
+            if (input == "0")
+                GetSelection();
+
+            return input;
+        }
+        public static string GetNumberInput(string message)
         {
             Console.WriteLine(message);
 

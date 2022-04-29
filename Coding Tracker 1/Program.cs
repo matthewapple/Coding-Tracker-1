@@ -24,7 +24,7 @@ namespace Coding_Tracker_1
                     Date TEXT,
                     StartTime TEXT,
                     EndTime TEXT,
-                    Duration TEXT)";
+                    Duration INT)";
 
                 tableCommand.ExecuteNonQuery();
 
