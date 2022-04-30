@@ -13,6 +13,7 @@ namespace Coding_Tracker_1
         public string EndTime { get; set; }
         public string Duration { get; set; }
         public string Date { get; set; }
+        public string TotalHours { get; set; }
 
     }
 }

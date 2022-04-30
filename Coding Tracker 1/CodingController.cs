@@ -14,18 +14,15 @@ namespace Coding_Tracker_1
     internal class CodingController
     {
         static string connectionString = ConfigurationManager.AppSettings["k1"];
-        //Duration calculation
-        internal static int Duration(string startTime, string endTime)
-        { 
-            TimeSpan startDuration = TimeSpan.ParseExact(startTime,"hh\\:mm", CultureInfo.InvariantCulture);
-            TimeSpan endDuration = TimeSpan.ParseExact(endTime, "hh\\:mm", CultureInfo.InvariantCulture);
-            TimeSpan difference = (endDuration - startDuration);
-            string stringDifference = difference.TotalHours.ToString();
+        internal static double Duration(string startTime, string endTime)
+        {
+            TimeSpan duration = DateTime.Parse(endTime).Subtract(DateTime.Parse(startTime));
 
-            int final = Convert.ToInt32(stringDifference);
+            double totalHours = Convert.ToDouble(duration.TotalHours);
+
+            double final = Math.Round(totalHours, 2);
 
             return final;
-
         }
         public static void Insert()
         {
@@ -38,31 +35,41 @@ namespace Coding_Tracker_1
 
             string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
 
-            string startTime = UserInput.GetNumberInput("Enter time coding started");
+            string startTime = UserInput.GetNumberInput("Enter time coding started (24 hour clock only)");
 
-            string endTime = UserInput.GetNumberInput("Enter time coding stopped");
+            string endTime = UserInput.GetNumberInput("Enter time coding stopped (24 hour clock only)");
 
-            int duration = Duration(startTime, endTime);
-
-            using (var connection = new SqliteConnection(connectionString))
+            double duration = Duration(startTime, endTime);
+            
+            //Negative duration validation
+            if (duration < 0)
             {
-                connection.Open();
-
-                var tableCommand = connection.CreateCommand();
-
-                tableCommand.CommandText = $"INSERT INTO Coding_Tracker (Date, StartTime, EndTime, Duration) VALUES ('{date}','{startTime}','{endTime}',{duration})";
-
-                tableCommand.ExecuteNonQuery();
-
-                connection.Close();
+                Console.WriteLine("Start time must be before stop time. Press any key to try again");
             }
+            else
+            {
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
 
+                    var tableCommand = connection.CreateCommand();
+
+                    tableCommand.CommandText = $"INSERT INTO Coding_Tracker (Date, StartTime, EndTime, Duration) VALUES ('{date}','{startTime}','{endTime}',{duration})";
+
+                    tableCommand.ExecuteNonQuery();
+
+                    connection.Close();
+                }
+            }
+            Console.WriteLine($"You coded for {duration} hours. Press any key to continue.");
+            Console.ReadKey();
             UserInput.GetSelection();
         }
         public static void GetAllRecords()
         {
             Console.WriteLine("ALL ENTRIES");
             Console.WriteLine("------------");
+            
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
@@ -86,11 +93,10 @@ namespace Coding_Tracker_1
                             Date = reader.GetString(1),
                             StartTime = reader.GetString(2),
                             EndTime = reader.GetString(3),
-                            Duration = reader.GetString(4)
-                        }); ;; ;
+                            Duration = reader.GetString(4),
+                    }); ;; ;
                         
                     }
-                    
 
                 }
                 else
@@ -98,8 +104,12 @@ namespace Coding_Tracker_1
 
                 connection.Close();
 
+                string totalHours = Total();
+
                 ConsoleTableBuilder.From(tableData).WithColumn("ID", "Start Time", "End Time", "Duration in Hours", "Date").ExportAndWriteLine();
-                Console.WriteLine();
+                Console.WriteLine("TOTAL HOURS CODED:");
+                Console.WriteLine("------------------");
+                Console.WriteLine(totalHours);
 
             }
             
@@ -116,37 +126,46 @@ namespace Coding_Tracker_1
 
             var inputId = UserInput.GetNumberInput("Enter ID of record you would like to update.");
 
-            using (var connection = new SqliteConnection(connectionString))
+            string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
+
+            string startTime = UserInput.GetNumberInput("Enter time coding started (24 hour clock only)");
+
+            string endTime = UserInput.GetNumberInput("Enter time coding stopped (24 hour clock only)");
+
+            double duration = Duration(startTime, endTime);
+            //Negative duration calculation
+            if (duration < 0)
             {
-                connection.Open();
-
-                var tableCommand = connection.CreateCommand();
-
-                string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
-
-                string startTime = UserInput.GetNumberInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
-
-                string endTime = UserInput.GetNumberInput("Please enter time coding started in 12 hour format (ex: 4:00 AM or 11:00 PM");
-
-                int duration = Duration(startTime, endTime);
-
-                tableCommand.CommandText = $"UPDATE Coding_Tracker SET Date = '{date}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = {duration} WHERE Id = {inputId}";
-
-                int rowCount = tableCommand.ExecuteNonQuery();
-
-                if (rowCount == 0)
+                Console.WriteLine("Start time must be before stop time. Press any key to try again");
+                Update();
+            }
+            else
+            {
+                using (var connection = new SqliteConnection(connectionString))
                 {
-                    Update();
-                    Console.WriteLine("Record does not exist. Please try again.");
-                }
-                else
-                {
-                    Console.WriteLine($"Record {inputId} was updated");
-                    Console.WriteLine("\n\nPress any key to continue");
-                    Console.ReadKey();
-                    Console.Clear();
+                    connection.Open();
+
+                    var tableCommand = connection.CreateCommand();
+
+                    tableCommand.CommandText = $"UPDATE Coding_Tracker SET Date = '{date}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = {duration} WHERE Id = {inputId}";
+
+                    int rowCount = tableCommand.ExecuteNonQuery();
+
+                    if (rowCount == 0)
+                    {
+                        Update();
+                        Console.WriteLine("Record does not exist. Please try again.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Record {inputId} was updated");
+                        Console.WriteLine("\n\nPress any key to continue");
+                        Console.ReadKey();
+                        Console.Clear();
+                    }
                 }
             }
+            
 
         }
         public static void Delete()
@@ -191,6 +210,23 @@ namespace Coding_Tracker_1
             }
             
         }
+        internal static string Total()
+        {
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
 
+                var tableCommand = connection.CreateCommand();
+
+                tableCommand.CommandText = @"SELECT SUM(Duration) FROM Coding_Tracker";
+
+                string result = tableCommand.ExecuteScalar().ToString();
+
+                connection.Close();
+
+                return result;
+            }
+            
+        }
     }
 }
