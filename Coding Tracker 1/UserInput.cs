@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 
 
@@ -60,14 +61,36 @@ namespace Coding_Tracker_1
             }
         }
 
-        public static string GetDateInput(string message)
+        public static string GetDateInput()
         {
-            Console.WriteLine(message);
+            Console.WriteLine("Please enter date of coding in MM-DD-YY format.");
 
             string input = Console.ReadLine();
             
             if (input == "0")
                 GetSelection();
+            
+            while (!DateTime.TryParseExact(input, "MM-dd-yy", new CultureInfo("en-US"), DateTimeStyles.None, out _))
+            {
+                Console.WriteLine("Invalid format. (Format MM-DD-YY required). Type 0 to return to main menu, or try again");
+                input = Console.ReadLine();
+            };
+
+            return input;
+        }
+        public static string GetTimeInput()
+        {
+            Console.WriteLine("Enter time coding started (24 hour clock (HH:MM) only)");
+
+            string input = Console.ReadLine();
+
+            if (input == "0")
+                GetSelection();
+            while (!DateTime.TryParseExact(input, "H:mm", new CultureInfo("en-US"), DateTimeStyles.None, out _))
+            {
+                Console.WriteLine("Invalid format. HH:MM required");
+                input = Console.ReadLine();
+            };
 
             return input;
         }

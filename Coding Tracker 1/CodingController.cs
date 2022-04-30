@@ -33,11 +33,11 @@ namespace Coding_Tracker_1
             Console.WriteLine("Enter 0 at any time to return to Main Menu");
             Console.WriteLine("--------\n");
 
-            string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
+            string date = UserInput.GetDateInput();
 
-            string startTime = UserInput.GetNumberInput("Enter time coding started (24 hour clock only)");
+            string startTime = UserInput.GetTimeInput();
 
-            string endTime = UserInput.GetNumberInput("Enter time coding stopped (24 hour clock only)");
+            string endTime = UserInput.GetTimeInput();
 
             double duration = Duration(startTime, endTime);
             
@@ -61,7 +61,9 @@ namespace Coding_Tracker_1
                     connection.Close();
                 }
             }
-            Console.WriteLine($"You coded for {duration} hours. Press any key to continue.");
+            Console.WriteLine("\n------------\n");
+            Console.WriteLine($"Entry inserted. You coded for {duration} hours. \n\nPress any key to continue.");
+            Console.WriteLine("\n------------");
             Console.ReadKey();
             UserInput.GetSelection();
         }
@@ -126,11 +128,11 @@ namespace Coding_Tracker_1
 
             var inputId = UserInput.GetNumberInput("Enter ID of record you would like to update.");
 
-            string date = UserInput.GetDateInput("Please enter date of coding in MM-DD-YY format.");
+            string date = UserInput.GetDateInput();
 
-            string startTime = UserInput.GetNumberInput("Enter time coding started (24 hour clock only)");
+            string startTime = UserInput.GetTimeInput();
 
-            string endTime = UserInput.GetNumberInput("Enter time coding stopped (24 hour clock only)");
+            string endTime = UserInput.GetTimeInput();
 
             double duration = Duration(startTime, endTime);
             //Negative duration calculation
@@ -158,7 +160,7 @@ namespace Coding_Tracker_1
                     }
                     else
                     {
-                        Console.WriteLine($"Record {inputId} was updated");
+                        Console.WriteLine($"\nRecord {inputId} was updated");
                         Console.WriteLine("\n\nPress any key to continue");
                         Console.ReadKey();
                         Console.Clear();
@@ -179,7 +181,7 @@ namespace Coding_Tracker_1
 
             GetAllRecords();
 
-            var inputId = UserInput.GetDateInput("Enter ID of record you would like to delete.");
+            var inputId = UserInput.GetNumberInput("Enter ID of record you would like to delete.");
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -222,9 +224,13 @@ namespace Coding_Tracker_1
 
                 string result = tableCommand.ExecuteScalar().ToString();
 
+                double rounded = Math.Round(Convert.ToDouble(result), 2);
+
+                string final = rounded.ToString();
+
                 connection.Close();
 
-                return result;
+                return final;
             }
             
         }
