@@ -7,6 +7,7 @@ using System.Configuration;
 using Microsoft.Data.Sqlite;
 using System.Globalization;
 using ConsoleTableExt;
+using System.Diagnostics;
 
 
 namespace Coding_Tracker_1
@@ -233,6 +234,74 @@ namespace Coding_Tracker_1
                 return final;
             }
             
+        }
+        public static void RunStopWatch()
+        {
+            Console.Clear();
+
+            Console.WriteLine("Press 1 to start your coding session");
+
+            Stopwatch stopWatch = new Stopwatch();
+
+            string startTime = "";
+            string endTime = "";
+            string date = "";
+
+            bool done = false;
+            while (!done)
+            {
+                var UserInput = Console.ReadLine();
+
+                switch (UserInput)
+                {
+                    case "1":
+                        stopWatch.Start();
+                        date = DateTime.Now.ToString("MM-dd-yy");
+                        startTime = DateTime.Now.ToString("H:mm");
+                        Console.WriteLine("Session is currently being tracked. Enter 2 to end session");
+                        break;
+                    case "2":
+                        stopWatch.Stop();
+                        endTime = DateTime.Now.ToString("H:mm");
+                        done = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input");
+                        break;
+                }
+
+            }
+
+            double duration = Duration(startTime, endTime);
+
+            Console.WriteLine($"\nYou coded for {duration} hours. Would you like to insert this as an entry?");
+            Console.WriteLine("\nPress 1 to insert, or 2 to cancel.");
+
+            string insertInput = Console.ReadLine();
+
+            if (insertInput == "1")
+            {
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    var tableCommand = connection.CreateCommand();
+
+                    tableCommand.CommandText = $"INSERT INTO Coding_Tracker (Date, StartTime, EndTime, Duration) VALUES ('{date}','{startTime}','{endTime}',{duration})";
+
+                    tableCommand.ExecuteNonQuery();
+
+                    connection.Close();
+                }
+                Console.WriteLine("Entry inserted. Press any key to return to Main Menu");
+                Console.ReadKey();
+            }
+            else if (insertInput == "2")
+            {
+                Console.WriteLine("Entry cancelled. Press any key to return to Main Menu");
+            }
+            
+            UserInput.GetSelection();
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Coding_Tracker_1
                 Console.WriteLine("Type 2 to Update an Entry");
                 Console.WriteLine("Type 3 to View all Entries");
                 Console.WriteLine("Type 4 to Delete an Entry");
+                Console.WriteLine("Type 5 to Track a Session");
 
                 string input = Console.ReadLine();
 
@@ -53,6 +54,10 @@ namespace Coding_Tracker_1
                     case "4":
                         CodingController.Delete();
                         break;
+                    case "5":
+                        CodingController.RunStopWatch();
+                        break;
+                    
                     default:
                         Console.WriteLine("Invalid input. Please enter a number 0 - 4");
                         break;
@@ -102,6 +107,13 @@ namespace Coding_Tracker_1
 
             if (input == "0")
                 GetSelection();
+
+            while ((!Int32.TryParse(input, out _)) || (Convert.ToInt32(input) < 0))
+            {
+                Console.WriteLine("Invalid input. Please try again.");
+                input = Console.ReadLine();
+                
+            }
 
             return input;
         }
